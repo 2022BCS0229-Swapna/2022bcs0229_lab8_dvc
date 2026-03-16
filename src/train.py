@@ -5,10 +5,17 @@ from sklearn.metrics import mean_squared_error, r2_score
 
 df = pd.read_csv("data/housing.csv")
 
+df = df.dropna()
+
+# Convert categorical column to numeric
+df = pd.get_dummies(df, columns=["ocean_proximity"])
+
 X = df.drop("median_house_value", axis=1)
 y = df["median_house_value"]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
 model = LinearRegression()
 model.fit(X_train, y_train)
@@ -18,9 +25,11 @@ pred = model.predict(X_test)
 rmse = mean_squared_error(y_test, pred, squared=False)
 r2 = r2_score(y_test, pred)
 
+print("Dataset size:", len(df))
 print("RMSE:", rmse)
 print("R2:", r2)
 
 with open("metrics.txt", "w") as f:
+    f.write(f"Dataset size: {len(df)}\n")
     f.write(f"RMSE: {rmse}\n")
     f.write(f"R2: {r2}\n")
